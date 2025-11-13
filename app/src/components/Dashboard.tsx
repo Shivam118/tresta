@@ -63,7 +63,6 @@ export default function Dashboard({
                 tasks={grouped[status]}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onChangeStatus={() => { }}
               />
             </AccordionDetails>
           </Accordion>
