@@ -9,11 +9,15 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import SearchIcon from "@mui/icons-material/Search";
 import TaskList from "./TaskList";
-import { Task } from "../../types";
+import { Task, TaskStatus } from "../../types";
+import { useMemo, useState } from "react";
 
 export default function Dashboard({
   tasks,
@@ -26,11 +30,29 @@ export default function Dashboard({
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
 }) {
-  const grouped = {
-    "in-progress": tasks.filter((t) => t.status === "in-progress"),
-    pending: tasks.filter((t) => t.status === "pending"),
-    completed: tasks.filter((t) => t.status === "completed"),
-  };
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return tasks;
+    return tasks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        (t.description || "").toLowerCase().includes(q)
+    );
+  }, [tasks, query]);
+
+  const grouped = useMemo(() => {
+    const g: Record<TaskStatus, Task[]> = {
+      "in-progress": [],
+      pending: [],
+      completed: [],
+    };
+    filtered.forEach((t) => g[t.status].push(t));
+    return g;
+  }, [filtered]);
+
+
 
   return (
     <Paper elevation={0}>
@@ -40,7 +62,24 @@ export default function Dashboard({
         </Typography>
       </Box>
 
+
       <Stack spacing={2} p={5}>
+        <TextField
+          fullWidth
+          placeholder="Search To-Do"
+          variant="outlined"
+          size="medium"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ mb: 2 }}
+        />
         {(["in-progress", "pending", "completed"] as const).map((status) => (
           <Accordion key={status} defaultExpanded disableGutters
             elevation={0}

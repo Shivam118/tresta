@@ -112,7 +112,7 @@ export default function TaskRow({
         }
         secondary={
           <Box sx={{ mt: 0.5 }}>
-            <Typography sx={{ color: "text.primary" }}>
+            <Typography sx={{ color: "text.primary" }} className="text-sm md:text-base">
               {task.description}
             </Typography>
             {task.date && (
